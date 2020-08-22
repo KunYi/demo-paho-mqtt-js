@@ -1,16 +1,16 @@
-var passWord = "";
-var username = "";
-var hostname = "broker.hivemq.com";  //HiveMQ
-var port = "8000";    //使用WebSocket協議的介面地址
-var clientId = makeid();
-var sub_topic = "test_sub01/#";
-var pub_topic = "test_pub01";
+const passWord = "";
+const username = "";
+const hostname = "broker.hivemq.com";  //HiveMQ
+const port = "8000";    //使用WebSocket協議的介面地址
+const clientId = makeId(10);
+const sub_topic = "/test_sub01/#";
+const pub_topic = "/test_pub01/LED01";
 
 var connected = false;
 
 var client = new Paho.Client(hostname, Number(port), clientId);
 
-logMessage("INFO", "Connecting to Server: [Host: ", hostname, ", Port: ", port, ", Path: ", client.path, ", ID: ", clientId, "]");
+logMessage("INFO", "Connecting to Server: [Host: ", hostname, ", Port: ", port, ", ID: ", clientId, "]");
 
 // set callback handlers
 client.onConnectionLost = onConnectionLost;
@@ -26,7 +26,7 @@ var options = {
     //reconnect: true,
     onSuccess: onConnect,
     onFailure: onFail,
-    mqttVersion: 4
+    mqttVersion: 4  // 3 for MQTT v3.1, 4 for MQTT 3.1.1
 };
 
 options.userName = username;
@@ -82,7 +82,7 @@ function onMessageArrived(message) {
 
 // called when the client connects
 function onConnect(context) {
-    // Once a connection has been made, make a subscription and send a message.
+    // Once a connection has been made, make a subscription.
     var connectionString = context.invocationContext.host + ":" + context.invocationContext.port;
     logMessage("INFO", "Connection Success ", "[URI: ", connectionString, ", ID: ", context.invocationContext.clientId, "]");
 
@@ -92,7 +92,7 @@ function onConnect(context) {
 
 
 function onConnected(reconnect, uri) {
-    // Once a connection has been made, make a subscription and send a message.
+    // Once a connection has been made
     logMessage("INFO", "Client Has now connected: [Reconnected: ", reconnect, ", URI: ", uri, "]");
     connected = true;
 }
@@ -103,12 +103,12 @@ function onFail(context) {
     connected = false;
 }
 
-function makeid() {
+function makeId(lenId) {
     // generation random connection ID;
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for (var i = 0; i < 16; i++)
+    for (var i = 0; i < lenId; i++)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
